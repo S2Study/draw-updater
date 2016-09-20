@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "@s2study/draw-api": "^0.1.0",
-    "@s2study/draw-history": "^0.1.0",
     "babel-runtime": "^6.11.6"
   }
 }
