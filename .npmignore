@@ -29,4 +29,5 @@ typings/
 gulpfile.js
 tsconfig.json
 typings.json
+index.ts
 test-results.xml

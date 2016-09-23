@@ -13,6 +13,7 @@
   "exclude": [
     "artifact",
     "node_modules",
+    "index.ts",
     "lib"
   ]
 }

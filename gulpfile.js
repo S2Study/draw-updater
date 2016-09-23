@@ -7,24 +7,30 @@ const sourcemaps = require('gulp-sourcemaps');
 const typescript = require('gulp-typescript');
 const tsConfig = {
 	target: 'es6',
-	declaration:true
+	declaration:true,
+	moduleResolution: "node",
+	jsx: "react"
 };
-gulp.task('compile', () =>{
+function doCompile(src,dest){
 	let tsResult = gulp
-		.src(['src/**/*.ts','typings/**/*.d.ts'])
+		.src(src)
 		.pipe(sourcemaps.init())
 		.pipe(typescript(tsConfig));
-
 	return merge2([
-		tsResult.dts.pipe(gulp.dest('lib')),
+		tsResult.dts.pipe(gulp.dest(dest)),
 		tsResult.js
 			.pipe(babel({ presets: ['stage-3', 'es2015'] }))
 			.pipe(sourcemaps.write(".",{
 				includeContent: true,
 				sourceRoot: '.'
 			}))
-			.pipe(gulp.dest('lib'))
-		]);
-	}
-);
+			.pipe(gulp.dest(dest))
+	]);
+}
+gulp.task('compile-lib', () => {
+		return doCompile(['src/**/*.ts', 'typings/**/*.d.ts'], 'lib');
+});
+gulp.task('compile',['compile-lib'], ()=>{
+		return doCompile(['index.ts','typings/**/*.d.ts'],'.');
+});
 gulp.task('default', ['compile']);
