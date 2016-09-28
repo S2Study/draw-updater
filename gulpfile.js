@@ -5,6 +5,8 @@ const babel = require('gulp-babel');
 const merge2 = require('merge2');
 const sourcemaps = require('gulp-sourcemaps');
 const typescript = require('gulp-typescript');
+const tslint = require("gulp-tslint");
+
 const tsConfig = {
 	target: 'es6',
 	declaration:true,
@@ -27,10 +29,17 @@ function doCompile(src,dest){
 			.pipe(gulp.dest(dest))
 	]);
 }
-gulp.task('compile-lib', () => {
-		return doCompile(['src/**/*.ts', 'typings/**/*.d.ts'], 'lib');
+gulp.task("tslint", () =>
+	gulp.src(['src/**/*.ts'])
+		.pipe(tslint({
+			formatter: "verbose"
+		}))
+		.pipe(tslint.report())
+);
+gulp.task('compile-lib',['tslint'], () => {
+	return doCompile(['src/**/*.ts', 'typings/**/*.d.ts'], 'lib');
 });
 gulp.task('compile',['compile-lib'], ()=>{
-		return doCompile(['index.ts','typings/**/*.d.ts'],'.');
+	return doCompile(['index.ts','typings/**/*.d.ts'],'.');
 });
 gulp.task('default', ['compile']);
