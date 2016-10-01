@@ -1,4 +1,4 @@
-import drawchat from "@s2study/draw-api";
+import * as drawchat from "@s2study/draw-api";
 
 import ColorStop = drawchat.structures.ColorStop;
 import Fill = drawchat.structures.Fill;

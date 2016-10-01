@@ -1,4 +1,4 @@
-import drawchat from "@s2study/draw-api";
+import * as drawchat from "@s2study/draw-api";
 
 import Transform = drawchat.structures.Transform;
 import DrawMoment = drawchat.history.DrawMoment;

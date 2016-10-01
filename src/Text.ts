@@ -1,4 +1,4 @@
-import drawchat from "@s2study/draw-api";
+import * as drawchat from "@s2study/draw-api";
 
 import TextTransaction = drawchat.updater.TextTransaction;
 import DrawHistory = drawchat.history.DrawHistory;

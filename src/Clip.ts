@@ -1,4 +1,4 @@
-import drawchat from "@s2study/draw-api";
+import * as drawchat from "@s2study/draw-api";
 
 import ClipTransaction = drawchat.updater.ClipTransaction;
 import PathItem = drawchat.structures.PathItem;

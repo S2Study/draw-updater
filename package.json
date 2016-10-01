@@ -1,6 +1,6 @@
 {
   "name": "@s2study/draw-updater",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "更新コマンドを実行し、draw-historyを更新するライブラリ",
   "main": "index.js",
   "scripts": {
