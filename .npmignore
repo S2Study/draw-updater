@@ -27,6 +27,7 @@ typings/
 .tsconfig.json
 .tomcatplugin
 gulpfile.js
+tslint.json
 tsconfig.json
 typings.json
 index.ts
