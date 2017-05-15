@@ -1,52 +1,46 @@
-import ClipTransaction = drawchat.updater.ClipTransaction;
-import PathItem = drawchat.PathItem;
-import MoveTo = drawchat.MoveTo;
-import ArcTo = drawchat.ArcTo;
-import QuadraticCurveTo = drawchat.QuadraticCurveTo;
-import LineTo = drawchat.LineTo;
-import BezierCurveTo = drawchat.BezierCurveTo;
-import Draw = drawchat.Draw;
-import DrawLayerMomentBuilder = drawchat.core.DrawLayerMomentBuilder;
-import DrawHistory = drawchat.core.DrawHistory;
-import DrawHistoryEditSession = drawchat.core.DrawHistoryEditSession;
-import Transform = drawchat.Transform;
-
 import {AbstractLayerTransaction} from "./AbstractLayerTransaction";
 import {TransformMap} from "./TransformMap";
 import {TransformCalculator} from "./TransformCalculator";
-export class Clip extends AbstractLayerTransaction implements ClipTransaction{
+import {history, structures} from "@s2study/draw-api";
+import PathItem = structures.PathItem;
+import DrawHistory = history.DrawHistory;
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import MoveTo = structures.MoveTo;
+import ArcTo = structures.ArcTo;
+import QuadraticCurveTo = structures.QuadraticCurveTo;
+import LineTo = structures.LineTo;
+import BezierCurveTo = structures.BezierCurveTo;
+import DrawLayerMomentBuilder = history.DrawLayerMomentBuilder;
+import {ClipFactory} from "@s2study/draw-api/lib/structures/Clip";
+export class ClipTransaction extends AbstractLayerTransaction {
 
-	private path:PathItem[] = [];
-	private savedPath:PathItem[] = [];
+	private path: PathItem[] = [];
+	private savedPath: PathItem[] = [];
 	// private transformMap:TransformMap;
 	// private transform:Transform;
 
-	constructor(
-		session:DrawHistoryEditSession,
-		history:DrawHistory,
-		layerId:string,
-		editLayerId:string,
-		transformMap:TransformMap
-	){
-		super(session,history,layerId,editLayerId,transformMap);
+	constructor(session: DrawHistoryEditSession,
+				history: DrawHistory,
+				layerId: string,
+				editLayerId: string,
+				transformMap: TransformMap) {
+		super(session, history, layerId, editLayerId, transformMap);
 		// this.transformMap = transformMap;
 	}
 
-	moveTo(
-		x:number,
-		y:number
-	):ClipTransaction {
+	moveTo(x: number,
+		y: number): ClipTransaction {
 		this.init();
 		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
-		let point = TransformCalculator.transform(invert,x,y);
+		let point = TransformCalculator.transform(invert, x, y);
 
 		this.path.push(
 			<MoveTo>{
-				type:0,
-				x:point.x,
-				y:point.y
+				type: 0,
+				x: point.x,
+				y: point.y
 			}
 		);
 		// this.doUpdate(
@@ -56,29 +50,27 @@ export class Clip extends AbstractLayerTransaction implements ClipTransaction{
 		return this;
 	}
 
-	arcTo(
-		x1:number,
-		y1:number,
-		x2:number,
-		y2:number,
-		radius:number
-	):ClipTransaction {
+	arcTo(x1: number,
+		y1: number,
+		x2: number,
+		y2: number,
+		radius: number): ClipTransaction {
 		this.init();
 		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 
-		let point1 = TransformCalculator.transform(invert,x1,y1);
-		let point2 = TransformCalculator.transform(invert,x2,y2);
+		let point1 = TransformCalculator.transform(invert, x1, y1);
+		let point2 = TransformCalculator.transform(invert, x2, y2);
 
 		this.path.push(
 			<ArcTo>{
-				type:1,
-				x1:point1.x,
-				y1:point1.y,
-				x2:point2.x,
-				y2:point2.y,
-				radius:radius
+				type: 1,
+				x1: point1.x,
+				y1: point1.y,
+				x2: point2.x,
+				y2: point2.y,
+				radius: radius
 			}
 		);
 		// this.doUpdate(
@@ -88,27 +80,25 @@ export class Clip extends AbstractLayerTransaction implements ClipTransaction{
 		return this;
 	}
 
-	quadraticCurveTo(
-		cpx:number,
-		cpy:number,
-		x:number,
-		y:number
-	):ClipTransaction {
+	quadraticCurveTo(cpx: number,
+			cpy: number,
+			x: number,
+			y: number): ClipTransaction {
 		this.init();
 		// this.transformMap.updateMap(this.history);
 
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
-		let point1 = TransformCalculator.transform(invert,cpx,cpy);
-		let point2 = TransformCalculator.transform(invert,x,y);
+		let point1 = TransformCalculator.transform(invert, cpx, cpy);
+		let point2 = TransformCalculator.transform(invert, x, y);
 
 		this.path.push(
 			<QuadraticCurveTo>{
-				type:2,
-				cpx:point1.x,
-				cpy:point1.y,
-				x:point2.x,
-				y:point2.y
+				type: 2,
+				cpx: point1.x,
+				cpy: point1.y,
+				x: point2.x,
+				y: point2.y
 			}
 		);
 		// this.doUpdate(
@@ -118,22 +108,20 @@ export class Clip extends AbstractLayerTransaction implements ClipTransaction{
 		return this;
 	}
 
-	lineTo(
-		x:number,
-		y:number
-	):ClipTransaction {
+	lineTo(x: number,
+		y: number): ClipTransaction {
 		this.init();
 		// this.transformMap.updateMap(this.history);
 
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
-		let point1 = TransformCalculator.transform(invert,x,y);
+		let point1 = TransformCalculator.transform(invert, x, y);
 
 		this.path.push(
 			<LineTo>{
-				type:3,
-				x:point1.x,
-				y:point1.y
+				type: 3,
+				x: point1.x,
+				y: point1.y
 			}
 		);
 		// this.doUpdate(
@@ -144,30 +132,29 @@ export class Clip extends AbstractLayerTransaction implements ClipTransaction{
 	}
 
 	bezierCurveTo(
-		cpx1:number,
-		cpy1:number,
-		cpx2:number,
-		cpy2:number,
-		x:number,
-		y:number
-	):ClipTransaction {
+		cpx1: number,
+		cpy1: number,
+		cpx2: number,
+		cpy2: number,
+		x: number,
+		y: number): ClipTransaction {
 		this.init();
 		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
-		let point1 = TransformCalculator.transform(invert,cpx1,cpy1);
-		let point2 = TransformCalculator.transform(invert,cpx2,cpy2);
-		let point3 = TransformCalculator.transform(invert,x,y);
+		let point1 = TransformCalculator.transform(invert, cpx1, cpy1);
+		let point2 = TransformCalculator.transform(invert, cpx2, cpy2);
+		let point3 = TransformCalculator.transform(invert, x, y);
 
 		this.path.push(
 			<BezierCurveTo>{
-				type:4,
-				cpx1:point1.x,
-				cpy1:point1.y,
-				cpx2:point2.x,
-				cpy2:point2.y,
-				x:point3.x,
-				y:point3.y
+				type: 4,
+				cpx1: point1.x,
+				cpy1: point1.y,
+				cpx2: point2.x,
+				cpy2: point2.y,
+				x: point3.x,
+				y: point3.y
 			}
 		);
 		// this.doUpdate(
@@ -196,9 +183,9 @@ export class Clip extends AbstractLayerTransaction implements ClipTransaction{
 		this.path = [];
 	}
 
-	protected beforeCommit(duration:boolean):void {
+	protected beforeCommit(duration: boolean): void {
 		Array.prototype.push.apply(this.savedPath, this.path);
-		this.doUpdate(this.getLayerBuilder(),this.savedPath);
+		this.doUpdate(this.getLayerBuilder(), this.savedPath);
 		this.savedPath = [];
 		this.path = [];
 		super.setSavePoint();
@@ -211,17 +198,12 @@ export class Clip extends AbstractLayerTransaction implements ClipTransaction{
 		super.setSavePoint();
 	}
 
-	private doUpdate(
-		layerBuilder:DrawLayerMomentBuilder,
-		path1:PathItem[]
-	):void{
-		if(path1 == null || path1.length === 0){
+	private doUpdate(layerBuilder: DrawLayerMomentBuilder,
+	path1: PathItem[]): void {
+		if (path1 == null || path1.length === 0) {
 			return;
 		}
-		layerBuilder.setClip(
-		<drawchat.Clip>{
-			path:path1
-		})
+		layerBuilder.setClip(ClipFactory.createInstance(path1))
 		.commit().commit();
 	}
 }

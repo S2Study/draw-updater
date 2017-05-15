@@ -1,38 +1,33 @@
-import TextTransaction = drawchat.updater.TextTransaction;
-import DrawHistory = drawchat.core.DrawHistory;
-import DrawHistoryEditSession = drawchat.core.DrawHistoryEditSession;
-import Fill = drawchat.Fill;
-import Stroke = drawchat.Stroke;
-import TextDraw = drawchat.TextDraw;
-import DrawLayerMomentBuilder = drawchat.core.DrawLayerMomentBuilder;
-
 import {AbstractTransaction} from "./AbstractTransaction";
 import {TransformMap} from "./TransformMap";
-import Transform = drawchat.Transform;
-export abstract class AbstractLayerTransaction extends AbstractTransaction{
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import DrawHistory = history.DrawHistory;
+import Transform = structures.Transform;
+import DrawLayerMomentBuilder = history.DrawLayerMomentBuilder;
+import {history, structures} from "@s2study/draw-api";
 
-	layerId:string;
-	private editLayerId:string;
-	private reservedPoint:number;
-	private initialized:boolean;
-	private transformMap:TransformMap;
+export abstract class AbstractLayerTransaction extends AbstractTransaction {
 
-	constructor(
-		session:DrawHistoryEditSession,
-		history:DrawHistory,
-		layerId:string,
-		editLayerId:string,
-		transformMap:TransformMap
-	){
-		super(session,history);
+	layerId: string;
+	private editLayerId: string;
+	private reservedPoint: number;
+	private initialized: boolean;
+	private transformMap: TransformMap;
+
+	constructor(session: DrawHistoryEditSession,
+				history: DrawHistory,
+				layerId: string,
+				editLayerId: string,
+				transformMap: TransformMap) {
+		super(session, history);
 		this.layerId = layerId;
 		this.editLayerId = editLayerId;
 		this.initialized = false;
 		this.transformMap = transformMap;
 	}
 
-	protected init():void{
-		if(!this.initialized){
+	protected init(): void {
+		if (!this.initialized) {
 			this.setup(true);
 			this.initialized = true;
 			this.transformMap.updateMap(this.history);
@@ -42,8 +37,8 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction{
 		this.transformMap.updateMap(this.history);
 	}
 
-	private setup(editLayer:boolean):void{
-		if(editLayer){
+	private setup(editLayer: boolean): void {
+		if (editLayer) {
 			this.setupEditLayer();
 		}
 		// this.reservedPoint = this.history.getNowHistoryNumber();
@@ -53,22 +48,22 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction{
 	/**
 	 * 編集用レイヤーをセットアップする。
 	 */
-	private setupEditLayer():void{
+	private setupEditLayer(): void {
 
 		let layers = this.history.getLayers();
 		let i = 0 | 0;
-		let result:string[] = [];
-		let item:string;
+		let result: string[] = [];
+		let item: string;
 		let addIndex = -1;
-		if(layers == null){
+		if (layers == null) {
 			layers = [];
 		}
 
-		while(i < layers.length){
-			item = layers[i];
-			if(item === this.editLayerId){
-				//並び替え不要
-				if(i === addIndex){
+		while (i < layers.length) {
+			item = layers[i]!;
+			if (item === this.editLayerId) {
+				// 並び替え不要
+				if (i === addIndex) {
 					this.reservedPoint = this.history.getNowHistoryNumber();
 					return;
 				}
@@ -78,12 +73,12 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction{
 			result.push(item);
 			i = (i + 1) | 0;
 
-			if(item === this.layerId){
+			if (item === this.layerId) {
 				result.push(this.editLayerId);
 				addIndex = i;
 			}
 		}
-		if(result.length === 0){
+		if (result.length === 0) {
 			result.push(this.editLayerId);
 		}
 		this.session.addMoment().setSequence(result).commit();
@@ -100,11 +95,11 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction{
 		this.reservedPoint = this.history.getNowHistoryNumber();
 	}
 
-	protected getTransform(layerId:string):Transform{
+	protected getTransform(layerId: string): Transform {
 		return this.transformMap.getTransForm(layerId);
 	}
 
-	protected beforeCommit(duration:boolean):void {
+	protected beforeCommit(duration: boolean): void {
 	}
 
 	protected afterCommit(duration: boolean): void {
@@ -112,18 +107,18 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction{
 	}
 
 	protected beforeCancel(duration: boolean): void {
-		//現在処理なし。
+		// 現在処理なし。
 	}
 
 	protected afterCancel(duration: boolean): void {
-		//現在処理なし。
+		// 現在処理なし。
 	}
 
-	protected getLayerBuilder():DrawLayerMomentBuilder{
+	protected getLayerBuilder(): DrawLayerMomentBuilder {
 		return this.session.addMoment().putLayerMoment(this.layerId);
 	}
 
-	protected getEditBuilder():DrawLayerMomentBuilder{
+	protected getEditBuilder(): DrawLayerMomentBuilder {
 		return this.session.addMoment().putLayerMoment(this.editLayerId);
 	}
 }

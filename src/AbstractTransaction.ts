@@ -1,18 +1,16 @@
-import TransformTransaction = drawchat.updater.TransformTransaction;
-import DrawHistory = drawchat.core.DrawHistory;
-import DrawHistoryEditSession = drawchat.core.DrawHistoryEditSession;
-import DrawTransaction = drawchat.updater.DrawTransaction;
-export abstract class AbstractTransaction implements DrawTransaction{
+import {history} from "@s2study/draw-api";
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import DrawHistory = history.DrawHistory;
 
-	protected session:DrawHistoryEditSession;
-	protected history:DrawHistory;
-	protected startPoint:number;
-	private savePoint:number;
+export abstract class AbstractTransaction {
 
-	constructor(
-		session:DrawHistoryEditSession,
-		history:DrawHistory
-	){
+	protected session: DrawHistoryEditSession;
+	protected history: DrawHistory;
+	protected startPoint: number;
+	private savePoint: number;
+
+	constructor(session: DrawHistoryEditSession,
+				history: DrawHistory) {
 		this.session = session;
 		this.startPoint = history.getNowHistoryNumber();
 		this.savePoint = this.startPoint;
@@ -30,7 +28,7 @@ export abstract class AbstractTransaction implements DrawTransaction{
 	cancel(duration: boolean = false): void {
 		this.session.setHistoryNumberNow(this.startPoint);
 		this.beforeCancel(duration);
-		if(!duration){
+		if (!duration) {
 			this.session.release();
 			return;
 		}
@@ -40,7 +38,7 @@ export abstract class AbstractTransaction implements DrawTransaction{
 	commit(duration: boolean = false): void {
 		this.session.setHistoryNumberNow(this.startPoint);
 		this.beforeCommit(duration);
-		if(!duration){
+		if (!duration) {
 			this.session.release();
 			this.afterCommit(duration);
 			return;
@@ -54,11 +52,12 @@ export abstract class AbstractTransaction implements DrawTransaction{
 	}
 
 	abstract flush(): void;
-	protected abstract beforeCancel(duration: boolean):void;
 
-	protected abstract afterCancel(duration: boolean):void;
+	protected abstract beforeCancel(duration: boolean): void;
 
-	protected abstract beforeCommit(duration: boolean):void;
+	protected abstract afterCancel(duration: boolean): void;
 
-	protected abstract afterCommit(duration: boolean):void;
+	protected abstract beforeCommit(duration: boolean): void;
+
+	protected abstract afterCommit(duration: boolean): void;
 }
