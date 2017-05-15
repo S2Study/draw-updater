@@ -1,42 +1,34 @@
-import * as drawchat from "@s2study/draw-api";
-
-import DrawchatUpdator = drawchat.updater.DrawchatUpdater;
-import DrawHistory = drawchat.history.DrawHistory;
-import DrawTransaction = drawchat.updater.DrawTransaction;
-import TransformTransaction = drawchat.updater.TransformTransaction;
-import ClipTransaction = drawchat.updater.ClipTransaction;
-import TextTransaction = drawchat.updater.TextTransaction;
-import ChangeSequenceTransaction = drawchat.updater.ChangeSequenceTransaction;
-import DrawHistoryEditSession = drawchat.history.DrawHistoryEditSession;
-import DrawchatUpdater = drawchat.updater.DrawchatUpdater;
-import DrawPathTransaction = drawchat.updater.DrawPathTransaction;
-
-import {Transform} from "./Transform";
-import {Clip} from "./Clip";
-import {Path} from "./Path";
-import {Text} from "./Text";
-import {ChangeSequence} from "./ChangeSequence";
+import {TransformTransaction} from "./TransformTransaction";
+import {ClipTransaction} from "./ClipTransaction";
+import {PathTransaction} from "./PathTransaction";
+import {TextTransaction} from "./TextTransaction";
+import {ChangeSequenceTransaction} from "./ChangeSequenceTransaction";
 import {TransformMap} from "./TransformMap";
-export class Updater implements DrawchatUpdater {
+import {history} from "@s2study/draw-api";
+import DrawHistory = history.DrawHistory;
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import {AbstractTransaction} from "./AbstractTransaction";
+import {LayerFactory} from "@s2study/draw-api/lib/structures/Layer";
+export class Updater {
 
 	private history: DrawHistory;
-	private currentTransaction: DrawTransaction = null;
+	private currentTransaction: AbstractTransaction | null = null;
 	private updaterStartPoint: number;
-	private editorLayerId: string = null;
+	private editorLayerId: string | null = null;
 	private transformMap: TransformMap = new TransformMap();
 	private queue: Promise<any>;
 
 	constructor(history: DrawHistory,
 				editorLayerId?: string) {
 		this.history = history;
-		this.editorLayerId = editorLayerId;
+		this.editorLayerId = editorLayerId === undefined ? null : editorLayerId;
 		this.queue = Promise.resolve("success");
 	}
 
 	addLayer(): Promise<string> {
 		this.queue = this.before().then((session) => {
 			try {
-				let moment = session.addLayer({draws: []}, false);
+				let moment = session.addLayer(LayerFactory.createInstance(), false);
 				return moment.getKeys()[0];
 			} finally {
 				session.release();
@@ -65,45 +57,45 @@ export class Updater implements DrawchatUpdater {
 		});
 	}
 
-	beginTransform(layerId: string, commit: boolean = true): Promise<TransformTransaction> {
+	beginTransform(layerId: string): Promise<TransformTransaction> {
 		this.queue = this.before().then((session) => {
-			let transaction = new Transform(session, this.history, layerId, this.editorLayerId, this.transformMap);
+			let transaction = new TransformTransaction(session, this.history, layerId, this.editorLayerId!, this.transformMap);
 			this.currentTransaction = transaction;
 			return transaction;
 		});
 		return this.queue;
 	}
 
-	beginClip(layerId: string, commit: boolean = true): Promise<ClipTransaction> {
+	beginClip(layerId: string): Promise<ClipTransaction> {
 		this.queue = this.before().then((session) => {
-			let transaction = new Clip(session, this.history, layerId, this.editorLayerId, this.transformMap);
+			let transaction = new ClipTransaction(session, this.history, layerId, this.editorLayerId!, this.transformMap);
 			this.currentTransaction = transaction;
 			return transaction;
 		});
 		return this.queue;
 	}
 
-	beginPath(layerId: string, commit: boolean = true): Promise<DrawPathTransaction> {
+	beginPath(layerId: string): Promise<PathTransaction> {
 		this.queue = this.before().then((session) => {
-			let transaction = new Path(session, this.history, layerId, this.editorLayerId, this.transformMap);
+			let transaction = new PathTransaction(session, this.history, layerId, this.editorLayerId!, this.transformMap);
 			this.currentTransaction = transaction;
 			return transaction;
 		});
 		return this.queue;
 	}
 
-	beginText(layerId: string, commit: boolean = true): Promise<TextTransaction> {
+	beginText(layerId: string): Promise<Text> {
 		this.queue = this.before().then((session) => {
-			let transaction = new Text(session, this.history, layerId, this.editorLayerId, this.transformMap);
+			let transaction = new TextTransaction(session, this.history, layerId, this.editorLayerId!, this.transformMap);
 			this.currentTransaction = transaction;
 			return transaction;
 		});
 		return this.queue;
 	}
 
-	beginChangeSequence(commit: boolean = true): Promise<ChangeSequenceTransaction> {
+	beginChangeSequence(): Promise<ChangeSequenceTransaction> {
 		this.queue = this.before().then((session) => {
-			let transaction = new ChangeSequence(session, this.history);
+			let transaction = new ChangeSequenceTransaction(session, this.history);
 			this.currentTransaction = transaction;
 			return transaction;
 		});
@@ -209,7 +201,7 @@ export class Updater implements DrawchatUpdater {
 					this.editorLayerId = layers[layers.length - 1];
 					return session;
 				}
-				let moment = session.addLayer({draws: []}, true);
+				let moment = session.addLayer(LayerFactory.createInstance(), true);
 				this.editorLayerId = moment.getSequence()[0];
 				this.updaterStartPoint = this.history.getNowHistoryNumber();
 				return session;

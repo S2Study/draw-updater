@@ -1,31 +1,32 @@
-import * as drawchat from "@s2study/draw-api";
-
-import TextTransaction = drawchat.updater.TextTransaction;
-import DrawHistory = drawchat.history.DrawHistory;
-import DrawHistoryEditSession = drawchat.history.DrawHistoryEditSession;
-import Fill = drawchat.structures.Fill;
-import Stroke = drawchat.structures.Stroke;
-import TextDraw = drawchat.structures.TextDraw;
-import DrawLayerMomentBuilder = drawchat.history.DrawLayerMomentBuilder;
-import ColorStop = drawchat.structures.ColorStop;
-
 import {AbstractLayerTransaction} from "./AbstractLayerTransaction";
 import {TransformMap} from "./TransformMap";
 import {TransformCalculator} from "./TransformCalculator";
-export class Text extends AbstractLayerTransaction implements TextTransaction {
+import {history, structures} from "@s2study/draw-api";
+import Fill = structures.Fill;
+import Stroke = structures.Stroke;
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import DrawHistory = history.DrawHistory;
+import ColorStop = structures.ColorStop;
+import DrawLayerMomentBuilder = history.DrawLayerMomentBuilder;
+import TextDraw = structures.TextDraw;
+import {FillFactory} from "@s2study/draw-api/lib/structures/Fill";
+import {StrokeFactory} from "@s2study/draw-api/lib/structures/Stroke";
+import {TextDrawFactory} from "@s2study/draw-api/lib/structures/TextDraw";
+import {TextFactory} from "@s2study/draw-api/lib/structures/Text";
+export class TextTransaction extends AbstractLayerTransaction {
 
-	private x: number;
-	private y: number;
-	private fill: Fill;
-	private stroke: Stroke;
-	private align: string;
-	private baseline: string;
-	private text: string;
-	private fontFamily: string;
-	private size: number;
-	private weight: number;
-	private style: number;
-	private compositeOperation: number;
+	private x: number | undefined;
+	private y: number | undefined;
+	private fill: Fill | undefined;
+	private stroke: Stroke | undefined;
+	// private align: string;
+	// private baseline: string;
+	private text: string | undefined;
+	private fontFamily: string | undefined;
+	private size: number | undefined;
+	private weight: number | undefined;
+	private style: number | undefined;
+	private compositeOperation: number | undefined;
 
 	constructor(session: DrawHistoryEditSession,
 				history: DrawHistory,
@@ -35,15 +36,14 @@ export class Text extends AbstractLayerTransaction implements TextTransaction {
 		super(session, history, layerId, editLayerId, transformMap);
 	}
 
-	setFill(color: string): TextTransaction {
-		this.fill = <Fill>{
-			color: color
-		};
+	setFill(color: number): TextTransaction {
+		// this.init();
+		this.fill = FillFactory.createInstance(color);
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
-	setFillLinerGradient(
-		x0: number,
+	setFillLinerGradient(x0: number,
 		y0: number,
 		x1: number,
 		y1: number,
@@ -64,11 +64,11 @@ export class Text extends AbstractLayerTransaction implements TextTransaction {
 				colorStops: colorStops
 			}
 		};
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
-	setFillRadialGradient(
-		x0: number,
+	setFillRadialGradient(x0: number,
 		y0: number,
 		r0: number,
 		x1: number,
@@ -93,33 +93,37 @@ export class Text extends AbstractLayerTransaction implements TextTransaction {
 				colorStops: colorStops
 			}
 		};
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
-	setStrokeColor(color: string): TextTransaction {
-		this.stroke = {
-			fillStyle: {
-				color: color
-			}
-		};
+	setStrokeColor(color: number): TextTransaction {
+		// this.init();
+		this.stroke = StrokeFactory.createInstance(FillFactory.createInstance(color));
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	push(text: string): TextTransaction {
 		this.init();
 		this.text = this.text == null ? text : this.text + text;
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
-	setBaseline(baseline?: string): TextTransaction {
-		this.baseline = baseline;
-		return this;
-	}
-
-	setAlign(align?: string): TextTransaction {
-		this.align = align;
-		return this;
-	}
+	// setBaseline(baseline?: string): Text {
+	// 	// this.init();
+	// 	this.baseline = DrawAPIUtils.complementString(baseline, "");
+	// 	// this.doUpdate(this.getEditBuilder());
+	// 	return this;
+	// }
+	//
+	// setAlign(align?: string): Text {
+	// 	// this.init();
+	// 	this.align = align;
+	// 	// this.doUpdate(this.getEditBuilder());
+	// 	return this;
+	// }
 
 	setPosition(x: number,
 				y: number): TextTransaction {
@@ -130,31 +134,43 @@ export class Text extends AbstractLayerTransaction implements TextTransaction {
 
 		this.x = point1.x;
 		this.y = point1.y;
+
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setFontFamily(fontFamily: string): TextTransaction {
+		// this.init();
 		this.fontFamily = fontFamily;
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setSize(size: number): TextTransaction {
+		// this.init();
 		this.size = size;
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setWeight(weight: number): TextTransaction {
+		// this.init();
 		this.weight = weight;
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setStyle(style: number): TextTransaction {
+		// this.init();
 		this.style = style;
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
-	setCompositeOperation(compositeOperation: number): drawchat.updater.TextTransaction {
+	setCompositeOperation(compositeOperation: number): TextTransaction {
+		// this.init();
 		this.compositeOperation = compositeOperation;
+		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
@@ -173,8 +189,6 @@ export class Text extends AbstractLayerTransaction implements TextTransaction {
 		this.y = undefined;
 		this.fill = undefined;
 		this.stroke = undefined;
-		this.align = undefined;
-		this.baseline = undefined;
 		this.text = undefined;
 		this.fontFamily = undefined;
 		this.size = undefined;
@@ -188,22 +202,21 @@ export class Text extends AbstractLayerTransaction implements TextTransaction {
 			return;
 		}
 		layerBuilder.addDraw(
-			<TextDraw>{
-				compositeOperation: this.compositeOperation,
-				text: {
-					x: this.x,
-					y: this.y,
-					fill: this.fill,
-					stroke: this.stroke,
-					align: this.align,
-					baseline: this.baseline,
-					text: this.text,
-					fontFamily: this.fontFamily,
-					size: this.size,
-					weight: this.weight,
-					style: this.style
-				}
-			})
-			.commit().commit();
+			TextDrawFactory.createInstance(
+				TextFactory.createInstance(
+					this.text,
+					this.x,
+					this.y,
+					this.size,
+					this.fill,
+					this.stroke,
+					this.fontFamily,
+					this.weight,
+					this.style
+				),
+				null,
+				this.compositeOperation
+		))
+		.commit().commit();
 	}
 }

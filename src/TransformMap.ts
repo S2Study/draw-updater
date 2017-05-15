@@ -1,14 +1,15 @@
-import * as drawchat from "@s2study/draw-api";
+import {history, structures} from "@s2study/draw-api";
 
-import Transform = drawchat.structures.Transform;
-import DrawMoment = drawchat.history.DrawMoment;
-import DrawHistory = drawchat.history.DrawHistory;
+import Transform = structures.Transform;
+import DrawHistory = history.DrawHistory;
+import DrawMoment = history.DrawMoment;
+import {TransformFactory} from "@s2study/draw-api/lib/structures/Transform";
 export class TransformMap {
 
-	static TRANSFORM_DEFAULT: Transform = {a: 1, b: 0, c: 0, d: 1, x: 0, y: 0};
+	static TRANSFORM_DEFAULT: Transform = TransformFactory.createInstance();
 
 	private historyNumber: number = -1;
-	private layerMap: {[key: string]: Transform} = {};
+	private layerMap: { [key: string]: Transform } = {};
 
 	getTransForm(key: string): Transform {
 		let transform: Transform = this.layerMap[key];
@@ -44,8 +45,8 @@ export class TransformMap {
 			keys = moment.getKeys();
 			while (j < keys.length) {
 				let layer = moment.getLayerMoment(keys[j]);
-				if (layer.getTransform() != null) {
-					this.layerMap[keys[j]] = layer.getTransform();
+				if (layer !== null && layer.getTransform() != null) {
+					this.layerMap[keys[j]] = layer.getTransform()!;
 				}
 				j = (j + 1) | 0;
 			}

@@ -1,13 +1,11 @@
-import * as drawchat from "@s2study/draw-api";
-
-import DrawchatUpdater = drawchat.updater.DrawchatUpdater;
-import DrawHistory = drawchat.history.DrawHistory;
 import {Updater} from "./Updator";
+import {history} from "@s2study/draw-api";
+import DrawHistory = history.DrawHistory;
 
 export function createInstance(
 	history: DrawHistory,
 	editorLayerId?: string
-): DrawchatUpdater {
+): Updater {
 	return new Updater(history, editorLayerId);
 }
 export default createInstance;

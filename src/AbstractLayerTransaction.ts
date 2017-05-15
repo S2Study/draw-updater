@@ -1,16 +1,11 @@
-import * as drawchat from "@s2study/draw-api";
-
-import TextTransaction = drawchat.updater.TextTransaction;
-import DrawHistory = drawchat.history.DrawHistory;
-import DrawHistoryEditSession = drawchat.history.DrawHistoryEditSession;
-import Fill = drawchat.structures.Fill;
-import Stroke = drawchat.structures.Stroke;
-import TextDraw = drawchat.structures.TextDraw;
-import DrawLayerMomentBuilder = drawchat.history.DrawLayerMomentBuilder;
-import Transform = drawchat.structures.Transform;
-
 import {AbstractTransaction} from "./AbstractTransaction";
 import {TransformMap} from "./TransformMap";
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import DrawHistory = history.DrawHistory;
+import Transform = structures.Transform;
+import DrawLayerMomentBuilder = history.DrawLayerMomentBuilder;
+import {history, structures} from "@s2study/draw-api";
+
 export abstract class AbstractLayerTransaction extends AbstractTransaction {
 
 	layerId: string;
@@ -65,7 +60,7 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction {
 		}
 
 		while (i < layers.length) {
-			item = layers[i];
+			item = layers[i]!;
 			if (item === this.editLayerId) {
 				// 並び替え不要
 				if (i === addIndex) {

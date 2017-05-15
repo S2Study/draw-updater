@@ -1,10 +1,8 @@
-import * as drawchat from "@s2study/draw-api";
+import {history} from "@s2study/draw-api";
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import DrawHistory = history.DrawHistory;
 
-import TransformTransaction = drawchat.updater.TransformTransaction;
-import DrawHistory = drawchat.history.DrawHistory;
-import DrawHistoryEditSession = drawchat.history.DrawHistoryEditSession;
-import DrawTransaction = drawchat.updater.DrawTransaction;
-export abstract class AbstractTransaction implements DrawTransaction {
+export abstract class AbstractTransaction {
 
 	protected session: DrawHistoryEditSession;
 	protected history: DrawHistory;

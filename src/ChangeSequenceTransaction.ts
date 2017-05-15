@@ -1,11 +1,8 @@
-import * as drawchat from "@s2study/draw-api";
-
-import ChangeSequenceTransaction = drawchat.updater.ChangeSequenceTransaction;
-import DrawHistoryEditSession = drawchat.history.DrawHistoryEditSession;
-import DrawHistory = drawchat.history.DrawHistory;
-
 import {AbstractTransaction} from "./AbstractTransaction";
-export class ChangeSequence extends AbstractTransaction implements ChangeSequenceTransaction {
+import {history} from "@s2study/draw-api";
+import DrawHistoryEditSession = history.DrawHistoryEditSession;
+import DrawHistory = history.DrawHistory;
+export class ChangeSequenceTransaction extends AbstractTransaction {
 
 	private sequences: string[];
 	// private history:DrawHistory;
@@ -87,13 +84,13 @@ export class ChangeSequence extends AbstractTransaction implements ChangeSequenc
 				continue;
 			}
 			if (has) {
-				result.push(this.sequences[i]);
+				result.push(this.sequences[i]!);
 			}
 			if (i === index) {
 				result.push(layerId);
 			}
 			if (!has) {
-				result.push(this.sequences[i]);
+				result.push(this.sequences[i]!);
 			}
 			i = (i + 1) | 0;
 		}
@@ -118,7 +115,7 @@ export class ChangeSequence extends AbstractTransaction implements ChangeSequenc
 		let i = 0 | 0;
 		while (i < this.sequences.length) {
 			if (this.sequences[i] !== layerId) {
-				resultTo.push(this.sequences[i]);
+				resultTo.push(this.sequences[i]!);
 			} else {
 				has = true;
 			}
