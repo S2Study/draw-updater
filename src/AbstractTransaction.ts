@@ -9,8 +9,10 @@ export abstract class AbstractTransaction {
 	protected startPoint: number;
 	private savePoint: number;
 
-	constructor(session: DrawHistoryEditSession,
-				history: DrawHistory) {
+	constructor(
+		session: DrawHistoryEditSession,
+		history: DrawHistory
+	) {
 		this.session = session;
 		this.startPoint = history.getNowHistoryNumber();
 		this.savePoint = this.startPoint;

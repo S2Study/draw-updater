@@ -12,122 +12,92 @@ import LineTo = structures.LineTo;
 import BezierCurveTo = structures.BezierCurveTo;
 import DrawLayerMomentBuilder = history.DrawLayerMomentBuilder;
 import {ClipFactory} from "@s2study/draw-api/lib/structures/Clip";
+import {MoveToFactory} from "@s2study/draw-api/lib/structures/MoveTo";
+import {ArcToFactory} from "@s2study/draw-api/lib/structures/ArcTo";
+import {QuadraticCurveToFactory} from "@s2study/draw-api/lib/structures/QuadraticCurveTo";
+import {LineToFactory} from "@s2study/draw-api/lib/structures/LineTo";
+import {BezierCurveToFactory} from "@s2study/draw-api/lib/structures/BezierCurveTo";
 export class ClipTransaction extends AbstractLayerTransaction {
 
 	private path: PathItem[] = [];
 	private savedPath: PathItem[] = [];
-	// private transformMap:TransformMap;
-	// private transform:Transform;
 
-	constructor(session: DrawHistoryEditSession,
-				history: DrawHistory,
-				layerId: string,
-				editLayerId: string,
-				transformMap: TransformMap) {
+	constructor(
+		session: DrawHistoryEditSession,
+		history: DrawHistory,
+		layerId: string,
+		editLayerId: string,
+		transformMap: TransformMap
+	) {
 		super(session, history, layerId, editLayerId, transformMap);
-		// this.transformMap = transformMap;
 	}
 
-	moveTo(x: number,
-		y: number): ClipTransaction {
+	moveTo(
+		x: number,
+		y: number
+	): ClipTransaction {
+
 		this.init();
-		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point = TransformCalculator.transform(invert, x, y);
-
-		this.path.push(
-			<MoveTo>{
-				type: 0,
-				x: point.x,
-				y: point.y
-			}
-		);
-		// this.doUpdate(
-		// 	this.getEditBuilder().setTransForm(transform),
-		// 	this.path
-		// );
+		this.path.push(MoveToFactory.createInstance(
+			point.x, point.y
+		));
 		return this;
 	}
 
-	arcTo(x1: number,
+	arcTo(
+		x1: number,
 		y1: number,
 		x2: number,
 		y2: number,
-		radius: number): ClipTransaction {
+		radius: number
+	): ClipTransaction {
+
 		this.init();
-		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
-
 		let point1 = TransformCalculator.transform(invert, x1, y1);
 		let point2 = TransformCalculator.transform(invert, x2, y2);
 
-		this.path.push(
-			<ArcTo>{
-				type: 1,
-				x1: point1.x,
-				y1: point1.y,
-				x2: point2.x,
-				y2: point2.y,
-				radius: radius
-			}
-		);
-		// this.doUpdate(
-		// 	this.getEditBuilder().setTransForm(transform),
-		// 	this.path
-		// );
+		this.path.push(ArcToFactory.createInstance(
+			point1.x, point1.y, point2.x, point2.y, radius
+		));
 		return this;
 	}
 
-	quadraticCurveTo(cpx: number,
-			cpy: number,
-			x: number,
-			y: number): ClipTransaction {
-		this.init();
-		// this.transformMap.updateMap(this.history);
+	quadraticCurveTo(
+		cpx: number,
+		cpy: number,
+		x: number,
+		y: number
+	): ClipTransaction {
 
+		this.init();
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, cpx, cpy);
 		let point2 = TransformCalculator.transform(invert, x, y);
 
-		this.path.push(
-			<QuadraticCurveTo>{
-				type: 2,
-				cpx: point1.x,
-				cpy: point1.y,
-				x: point2.x,
-				y: point2.y
-			}
-		);
-		// this.doUpdate(
-		// 	this.getEditBuilder().setTransForm(transform),
-		// 	this.path
-		// );
+		this.path.push(QuadraticCurveToFactory.createInstance(
+			point1.x, point1.y, point2.x, point2.y
+		));
 		return this;
 	}
 
-	lineTo(x: number,
-		y: number): ClipTransaction {
-		this.init();
-		// this.transformMap.updateMap(this.history);
+	lineTo(
+		x: number,
+		y: number
+	): ClipTransaction {
 
+		this.init();
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, x, y);
-
-		this.path.push(
-			<LineTo>{
-				type: 3,
-				x: point1.x,
-				y: point1.y
-			}
-		);
-		// this.doUpdate(
-		// 	this.getEditBuilder().setTransForm(transform),
-		// 	this.path
-		// );
+		this.path.push(LineToFactory.createInstance(
+			point1.x, point1.y
+		));
 		return this;
 	}
 
@@ -137,30 +107,19 @@ export class ClipTransaction extends AbstractLayerTransaction {
 		cpx2: number,
 		cpy2: number,
 		x: number,
-		y: number): ClipTransaction {
+		y: number
+	): ClipTransaction {
+
 		this.init();
-		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, cpx1, cpy1);
 		let point2 = TransformCalculator.transform(invert, cpx2, cpy2);
 		let point3 = TransformCalculator.transform(invert, x, y);
 
-		this.path.push(
-			<BezierCurveTo>{
-				type: 4,
-				cpx1: point1.x,
-				cpy1: point1.y,
-				cpx2: point2.x,
-				cpy2: point2.y,
-				x: point3.x,
-				y: point3.y
-			}
-		);
-		// this.doUpdate(
-		// 	this.getEditBuilder().setTransForm(transform),
-		// 	this.path
-		// );
+		this.path.push(BezierCurveToFactory.createInstance(
+			point1.x, point1.y, point2.x, point2.y, point3.x, point3.y
+		));
 		return this;
 	}
 

@@ -20,6 +20,17 @@ import GraphicsDraw = structures.GraphicsDraw;
 import {StrokeStyleFactory} from "@s2study/draw-api/lib/structures/StrokeStyle";
 import {DashFactory} from "@s2study/draw-api/lib/structures/Dash";
 import {FillFactory} from "@s2study/draw-api/lib/structures/Fill";
+import {LinerGradientFactory} from "@s2study/draw-api/lib/structures/LinerGradient";
+import {RadialGradientFactory} from "@s2study/draw-api/lib/structures/RadialGradient";
+import {MoveToFactory} from "@s2study/draw-api/lib/structures/MoveTo";
+import {ArcToFactory} from "@s2study/draw-api/lib/structures/ArcTo";
+import {LineToFactory} from "@s2study/draw-api/lib/structures/LineTo";
+import {QuadraticCurveToFactory} from "@s2study/draw-api/lib/structures/QuadraticCurveTo";
+import {BezierCurveToFactory} from "@s2study/draw-api/lib/structures/BezierCurveTo";
+import {GraphicsDrawFactory} from "@s2study/draw-api/lib/structures/GraphicsDraw";
+import {GraphicFactory} from "@s2study/draw-api/lib/structures/Graphic";
+import {StrokeFactory} from "@s2study/draw-api/lib/structures/Stroke";
+import {TRANSFORM_DEFAULT} from "@s2study/draw-api/lib/structures/Transform";
 export class PathTransaction extends AbstractLayerTransaction {
 
 	private fill: Fill;
@@ -29,26 +40,21 @@ export class PathTransaction extends AbstractLayerTransaction {
 
 	private path: PathItem[] = [];
 	private savedPath: PathItem[] = [];
-
-	// private transformMap:TransformMap;
 	private compositeOperation: number;
-	// private transform:Transform;
 
-	constructor(session: DrawHistoryEditSession,
-				history: DrawHistory,
-				layerId: string,
-				editLayerId: string,
-				transformMap: TransformMap) {
+	constructor(
+		session: DrawHistoryEditSession,
+		history: DrawHistory,
+		layerId: string,
+		editLayerId: string,
+		transformMap: TransformMap
+	) {
 		super(session, history, layerId, editLayerId, transformMap);
-		// this.transformMap = transformMap;
 	}
 
 	setFill(color: number): PathTransaction {
 		this.init();
-		// this.transformMap.updateMap(this.history);
-		// let transform = this.getTransform(this.layerId);
 		this.fill = FillFactory.createInstance(color);
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
 		return this;
 	}
 
@@ -60,21 +66,18 @@ export class PathTransaction extends AbstractLayerTransaction {
 		colorStops?: ColorStop[]
 	): PathTransaction {
 		this.init();
-		// this.transformMap.updateMap(this.history);
+
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, x0, y0);
 		let point2 = TransformCalculator.transform(invert, x1, y1);
-		this.fill = <Fill>{
-			linerGradient: {
-				x0: point1.x,
-				y0: point1.y,
-				x1: point2.x,
-				y1: point2.y,
-				colorStops: colorStops
-			}
-		};
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
+		this.fill = FillFactory.createInstance(null, LinerGradientFactory.createInstance(
+			point1.x,
+			point1.y,
+			point2.x,
+			point2.y,
+			colorStops
+		));
 		return this;
 	}
 
@@ -88,23 +91,19 @@ export class PathTransaction extends AbstractLayerTransaction {
 		colorStops?: ColorStop[]
 	): PathTransaction {
 		this.init();
-		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, x0, y0);
 		let point2 = TransformCalculator.transform(invert, x1, y1);
-		this.fill = <Fill>{
-			radialGradient: {
-				x0: point1.x,
-				y0: point1.y,
-				r0: r0,
-				x1: point2.x,
-				y1: point2.y,
-				r1: r1,
-				colorStops: colorStops
-			}
-		};
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
+		this.fill = FillFactory.createInstance(null, null, RadialGradientFactory.createInstance(
+			point1.x,
+			point1.y,
+			r0,
+			point2.x,
+			point2.y,
+			r1,
+			colorStops
+		));
 		return this;
 	}
 
@@ -113,8 +112,10 @@ export class PathTransaction extends AbstractLayerTransaction {
 		return this;
 	}
 
-	setStrokeDash(segments?: number[],
-		offset?: number): PathTransaction {
+	setStrokeDash(
+		segments?: number[],
+		offset?: number
+	): PathTransaction {
 		this.dash = DashFactory.createInstance(
 			segments,
 			offset
@@ -128,9 +129,6 @@ export class PathTransaction extends AbstractLayerTransaction {
 		miterLimit?: number,
 		ignoreScale?: number
 	): PathTransaction {
-		// this.init();
-		// this.transformMap.updateMap(this.history);
-		// let transform = this.getTransform(this.layerId);
 		this.style = StrokeStyleFactory.createInstance(
 			thickness,
 			caps,
@@ -141,67 +139,51 @@ export class PathTransaction extends AbstractLayerTransaction {
 		return this;
 	}
 
-	moveTo(x: number,
-			y: number): PathTransaction {
+	moveTo(
+		x: number,
+		y: number
+	): PathTransaction {
 		this.init();
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point = TransformCalculator.transform(invert, x, y);
 
-		this.path.push(
-			<MoveTo>{
-				type: 0,
-				x: point.x,
-				y: point.y
-			}
-		);
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
+		this.path.push(MoveToFactory.createInstance(
+			point.x, point.y
+		));
 		return this;
 	}
 
-	arcTo(x1: number,
-			y1: number,
-			x2: number,
-			y2: number,
-			radius: number): PathTransaction {
+	arcTo(
+		x1: number,
+		y1: number,
+		x2: number,
+		y2: number,
+		radius: number
+	): PathTransaction {
 		this.init();
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, x1, y1);
 		let point2 = TransformCalculator.transform(invert, x2, y2);
 
-		this.path.push(
-			<ArcTo>{
-				type: 1,
-				x1: point1.x,
-				y1: point1.y,
-				x2: point2.x,
-				y2: point2.y,
-				radius: radius
-			}
-		);
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
+		this.path.push(ArcToFactory.createInstance(
+			point1.x, point1.y, point2.x, point2.y, radius
+		));
 		return this;
 	}
 
 	lineTo(
 		x: number,
-		y: number): PathTransaction {
+		y: number
+	): PathTransaction {
 		this.init();
-
-		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point = TransformCalculator.transform(invert, x, y);
-
-		this.path.push(
-			<LineTo>{
-				type: 3,
-				x: point.x,
-				y: point.y
-			}
-		);
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
+		this.path.push(LineToFactory.createInstance(
+			point.x, point.y
+		));
 		return this;
 	}
 
@@ -213,23 +195,14 @@ export class PathTransaction extends AbstractLayerTransaction {
 	): PathTransaction {
 		this.init();
 
-		// this.transformMap.updateMap(this.history);
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, cpx, cpy);
 		let point2 = TransformCalculator.transform(invert, x, y);
 
-		this.path.push(
-			<QuadraticCurveTo>{
-				type: 2,
-				cpx: point1.x,
-				cpy: point1.y,
-				x: point2.x,
-				y: point2.y
-			}
-		);
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
-		// this.doUpdate(this.getEditBuilder());
+		this.path.push(QuadraticCurveToFactory.createInstance(
+			point1.x, point1.y, point2.x, point2.y
+		));
 		return this;
 	}
 
@@ -239,25 +212,17 @@ export class PathTransaction extends AbstractLayerTransaction {
 		cpx2: number,
 		cpy2: number,
 		x: number,
-		y: number): PathTransaction {
+		y: number
+	): PathTransaction {
 		this.init();
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, cpx1, cpy1);
 		let point2 = TransformCalculator.transform(invert, cpx2, cpy2);
 		let point3 = TransformCalculator.transform(invert, x, y);
-		this.path.push(
-			<BezierCurveTo>{
-				type: 4,
-				cpx1: point1.x,
-				cpy1: point1.y,
-				cpx2: point2.x,
-				cpy2: point2.y,
-				x: point3.x,
-				y: point3.y
-			}
-		);
-		// this.doUpdate(this.getEditBuilder().setTransForm(transform),this.path);
+		this.path.push(BezierCurveToFactory.createInstance(
+			point1.x, point1.y, point2.x, point2.y, point3.x, point3.y
+		));
 		return this;
 	}
 
@@ -292,9 +257,7 @@ export class PathTransaction extends AbstractLayerTransaction {
 		this.doUpdate(this.getLayerBuilder(), this.savedPath);
 		this.savedPath = [];
 		this.path = [];
-		// super.setSavePoint();
 		super.beforeCommit(duration);
-		// console.log(`commit path`);
 	}
 
 	protected afterCancel(): void {
@@ -310,20 +273,19 @@ export class PathTransaction extends AbstractLayerTransaction {
 		if (path1 == null || path1.length === 0) {
 			return;
 		}
-		layerBuilder.addDraw(
-			<GraphicsDraw>{
-				compositeOperation: this.compositeOperation,
-				graphics: [<Graphic>{
-					fill: this.fill,
-					stroke: {
-						fillStyle: this.strokeFill,
-						dash: this.dash,
-						style: this.style
-					},
-					path: path1
-				}]
-			})
-			.commit().commit();
+		layerBuilder.addDraw(GraphicsDrawFactory.createInstance([
+			GraphicFactory.createInstance(
+				path1,
+				this.fill,
+				StrokeFactory.createInstance(
+					this.strokeFill,
+					this.dash,
+					this.style
+				)
+			)],
+			TRANSFORM_DEFAULT,
+			this.compositeOperation
+		)).commit().commit();
 	}
 
 }

@@ -5,13 +5,13 @@ import DrawHistory = history.DrawHistory;
 export class ChangeSequenceTransaction extends AbstractTransaction {
 
 	private sequences: string[];
-	// private history:DrawHistory;
 
-	constructor(session: DrawHistoryEditSession,
-				history: DrawHistory) {
+	constructor(
+		session: DrawHistoryEditSession,
+		history: DrawHistory
+	) {
 		super(session, history);
 		this.sequences = history.getLayers(history.getNowHistoryNumber(), false);
-		// this.history = history;
 	}
 
 	protected beforeCommit(): void {
@@ -105,7 +105,6 @@ export class ChangeSequenceTransaction extends AbstractTransaction {
 	}
 
 	private doUpdate(result: string[]): ChangeSequenceTransaction {
-		// this.session.addMoment().setSequence(result).commit();
 		this.sequences = result;
 		return this;
 	}

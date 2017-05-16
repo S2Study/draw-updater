@@ -13,14 +13,14 @@ import {FillFactory} from "@s2study/draw-api/lib/structures/Fill";
 import {StrokeFactory} from "@s2study/draw-api/lib/structures/Stroke";
 import {TextDrawFactory} from "@s2study/draw-api/lib/structures/TextDraw";
 import {TextFactory} from "@s2study/draw-api/lib/structures/Text";
+import {LinerGradientFactory} from "@s2study/draw-api/lib/structures/LinerGradient";
+import {RadialGradientFactory} from "@s2study/draw-api/lib/structures/RadialGradient";
 export class TextTransaction extends AbstractLayerTransaction {
 
 	private x: number | undefined;
 	private y: number | undefined;
 	private fill: Fill | undefined;
 	private stroke: Stroke | undefined;
-	// private align: string;
-	// private baseline: string;
 	private text: string | undefined;
 	private fontFamily: string | undefined;
 	private size: number | undefined;
@@ -28,18 +28,18 @@ export class TextTransaction extends AbstractLayerTransaction {
 	private style: number | undefined;
 	private compositeOperation: number | undefined;
 
-	constructor(session: DrawHistoryEditSession,
-				history: DrawHistory,
-				layerId: string,
-				editLayerId: string,
-				transformMap: TransformMap) {
+	constructor(
+		session: DrawHistoryEditSession,
+		history: DrawHistory,
+		layerId: string,
+		editLayerId: string,
+		transformMap: TransformMap
+	) {
 		super(session, history, layerId, editLayerId, transformMap);
 	}
 
 	setFill(color: number): TextTransaction {
-		// this.init();
 		this.fill = FillFactory.createInstance(color);
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
@@ -55,16 +55,13 @@ export class TextTransaction extends AbstractLayerTransaction {
 		let point1 = TransformCalculator.transform(invert, x0, y0);
 		let point2 = TransformCalculator.transform(invert, x1, y1);
 
-		this.fill = <Fill>{
-			linerGradient: {
-				x0: point1.x,
-				y0: point1.y,
-				x1: point2.x,
-				y1: point2.y,
-				colorStops: colorStops
-			}
-		};
-		// this.doUpdate(this.getEditBuilder());
+		this.fill = FillFactory.createInstance(null, LinerGradientFactory.createInstance(
+			point1.x,
+			point1.y,
+			point2.x,
+			point2.y,
+			colorStops
+		));
 		return this;
 	}
 
@@ -81,52 +78,33 @@ export class TextTransaction extends AbstractLayerTransaction {
 		let invert = TransformCalculator.invert(transform);
 		let point1 = TransformCalculator.transform(invert, x0, y0);
 		let point2 = TransformCalculator.transform(invert, x1, y1);
-
-		this.fill = <Fill>{
-			radialGradient: {
-				x0: point1.x,
-				y0: point1.y,
-				r0: r0,
-				x1: point2.x,
-				y1: point2.y,
-				r1: r1,
-				colorStops: colorStops
-			}
-		};
-		// this.doUpdate(this.getEditBuilder());
+		this.fill = FillFactory.createInstance( null, null, RadialGradientFactory.createInstance(
+			point1.x,
+			point1.y,
+			r0,
+			point2.x,
+			point2.y,
+			r1,
+			colorStops
+		));
 		return this;
 	}
 
 	setStrokeColor(color: number): TextTransaction {
-		// this.init();
 		this.stroke = StrokeFactory.createInstance(FillFactory.createInstance(color));
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	push(text: string): TextTransaction {
 		this.init();
 		this.text = this.text == null ? text : this.text + text;
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
-	// setBaseline(baseline?: string): Text {
-	// 	// this.init();
-	// 	this.baseline = DrawAPIUtils.complementString(baseline, "");
-	// 	// this.doUpdate(this.getEditBuilder());
-	// 	return this;
-	// }
-	//
-	// setAlign(align?: string): Text {
-	// 	// this.init();
-	// 	this.align = align;
-	// 	// this.doUpdate(this.getEditBuilder());
-	// 	return this;
-	// }
-
-	setPosition(x: number,
-				y: number): TextTransaction {
+	setPosition(
+		x: number,
+		y: number
+	): TextTransaction {
 		this.init();
 		let transform = this.getTransform(this.layerId);
 		let invert = TransformCalculator.invert(transform);
@@ -134,43 +112,31 @@ export class TextTransaction extends AbstractLayerTransaction {
 
 		this.x = point1.x;
 		this.y = point1.y;
-
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setFontFamily(fontFamily: string): TextTransaction {
-		// this.init();
 		this.fontFamily = fontFamily;
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setSize(size: number): TextTransaction {
-		// this.init();
 		this.size = size;
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setWeight(weight: number): TextTransaction {
-		// this.init();
 		this.weight = weight;
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setStyle(style: number): TextTransaction {
-		// this.init();
 		this.style = style;
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 
 	setCompositeOperation(compositeOperation: number): TextTransaction {
-		// this.init();
 		this.compositeOperation = compositeOperation;
-		// this.doUpdate(this.getEditBuilder());
 		return this;
 	}
 

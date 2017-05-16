@@ -14,11 +14,13 @@ export abstract class AbstractLayerTransaction extends AbstractTransaction {
 	private initialized: boolean;
 	private transformMap: TransformMap;
 
-	constructor(session: DrawHistoryEditSession,
-				history: DrawHistory,
-				layerId: string,
-				editLayerId: string,
-				transformMap: TransformMap) {
+	constructor(
+		session: DrawHistoryEditSession,
+		history: DrawHistory,
+		layerId: string,
+		editLayerId: string,
+		transformMap: TransformMap
+	) {
 		super(session, history);
 		this.layerId = layerId;
 		this.editLayerId = editLayerId;
