@@ -84,7 +84,7 @@ export class Updater {
 		return this.queue;
 	}
 
-	beginText(layerId: string): Promise<Text> {
+	beginText(layerId: string): Promise<TextTransaction> {
 		this.queue = this.before().then((session) => {
 			let transaction = new TextTransaction(session, this.history, layerId, this.editorLayerId!, this.transformMap);
 			this.currentTransaction = transaction;
