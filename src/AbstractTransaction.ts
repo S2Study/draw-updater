@@ -1,8 +1,9 @@
 import {history} from "@s2study/draw-api";
 import DrawHistoryEditSession = history.DrawHistoryEditSession;
 import DrawHistory = history.DrawHistory;
+import {DrawTransaction} from "./index";
 
-export abstract class AbstractTransaction {
+export abstract class AbstractTransaction implements DrawTransaction {
 
 	protected session: DrawHistoryEditSession;
 	protected history: DrawHistory;

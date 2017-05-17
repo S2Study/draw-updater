@@ -17,7 +17,9 @@ import {ArcToFactory} from "@s2study/draw-api/lib/structures/ArcTo";
 import {QuadraticCurveToFactory} from "@s2study/draw-api/lib/structures/QuadraticCurveTo";
 import {LineToFactory} from "@s2study/draw-api/lib/structures/LineTo";
 import {BezierCurveToFactory} from "@s2study/draw-api/lib/structures/BezierCurveTo";
-export class ClipTransaction extends AbstractLayerTransaction {
+import {IPathTransaction} from "./index";
+
+export class ClipTransaction extends AbstractLayerTransaction implements IPathTransaction {
 
 	private path: PathItem[] = [];
 	private savedPath: PathItem[] = [];

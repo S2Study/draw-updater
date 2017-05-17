@@ -31,7 +31,9 @@ import {GraphicsDrawFactory} from "@s2study/draw-api/lib/structures/GraphicsDraw
 import {GraphicFactory} from "@s2study/draw-api/lib/structures/Graphic";
 import {StrokeFactory} from "@s2study/draw-api/lib/structures/Stroke";
 import {TRANSFORM_DEFAULT} from "@s2study/draw-api/lib/structures/Transform";
-export class PathTransaction extends AbstractLayerTransaction {
+import {IPathTransaction} from "./index";
+
+export class PathTransaction extends AbstractLayerTransaction implements IPathTransaction {
 
 	private fill: Fill;
 	private strokeFill: Fill;
