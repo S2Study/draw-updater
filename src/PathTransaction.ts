@@ -35,10 +35,10 @@ import {IPathTransaction} from "./index";
 
 export class PathTransaction extends AbstractLayerTransaction implements IPathTransaction {
 
-	private fill: Fill;
-	private strokeFill: Fill;
-	private dash: Dash;
-	private style: StrokeStyle;
+	private fill: Fill | null;
+	private strokeFill: Fill | null;
+	private dash: Dash | null;
+	private style: StrokeStyle | null;
 
 	private path: PathItem[] = [];
 	private savedPath: PathItem[] = [];
@@ -52,6 +52,15 @@ export class PathTransaction extends AbstractLayerTransaction implements IPathTr
 		transformMap: TransformMap
 	) {
 		super(session, history, layerId, editLayerId, transformMap);
+		this.clearStyle();
+		// this.fill = null;
+	}
+
+	clearStyle(): void {
+		this.fill = null;
+		this.style = null;
+		this.strokeFill = null;
+		this.dash = null;
 	}
 
 	setFill(color: number): PathTransaction {
@@ -279,7 +288,7 @@ export class PathTransaction extends AbstractLayerTransaction implements IPathTr
 			GraphicFactory.createInstance(
 				path1,
 				this.fill,
-				StrokeFactory.createInstance(
+				( this.strokeFill === null && this.dash === null && this.style === null ) ? null : StrokeFactory.createInstance(
 					this.strokeFill,
 					this.dash,
 					this.style
