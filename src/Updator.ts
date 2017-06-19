@@ -11,7 +11,7 @@ import {AbstractTransaction} from "./AbstractTransaction";
 import {LayerFactory} from "@s2study/draw-api/lib/structures/Layer";
 export class Updater {
 
-	private history: DrawHistory;
+	readonly history: DrawHistory;
 	private currentTransaction: AbstractTransaction | null = null;
 	private updaterStartPoint: number;
 	private editorLayerId: string | null = null;
